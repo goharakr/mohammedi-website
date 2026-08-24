@@ -5,6 +5,16 @@ export const heroSlides = [
   { eyebrow: '04 / ARCHITECTURE', title: 'Build a point\nof view.', description: 'From gypsum ceilings to statement stone, complete building solutions in Kisumu.', image: 'https://images.pexels.com/photos/271816/pexels-photo-271816.jpeg?auto=compress&cs=tinysrgb&w=2200' },
 ];
 
+export const contact = {
+  whatsapp: '254726308830',
+  phoneDisplay: '+254 726 308 830',
+  email: 'gohark47@yahoo.com',
+  facebookUrl: 'https://www.facebook.com/share/17LmzdKWKq/',
+  instagramUrl: 'https://www.instagram.com/kisumu_glass_sanitary',
+  mapsUrl: 'https://share.google/3iUAR5N4zeHtybrli',
+  addressLabel: 'Kisumu, Kenya',
+};
+
 export const inspiration = [
   { title: 'Bathing in light', category: 'Bathroom', image: 'https://images.pexels.com/photos/6585758/pexels-photo-6585758.jpeg?auto=compress&cs=tinysrgb&w=1400' },
   { title: 'Warm modernism', category: 'Living room', image: 'https://images.pexels.com/photos/1571460/pexels-photo-1571460.jpeg?auto=compress&cs=tinysrgb&w=1400' },

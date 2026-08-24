@@ -1,12 +1,13 @@
-import { ArrowDown, ArrowRight, ArrowUpRight, Calculator, Filter, MapPin, Search, Sparkles, X } from 'lucide-react';
+import { ArrowDown, ArrowRight, ArrowUpRight, Calculator, Facebook, Filter, Instagram, MapPin, MessageCircle, Phone, Search, Sparkles, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductDetail } from '@/components/ProductDetail';
 import { Visualizer } from '@/components/Visualizer';
-import { heroSlides, inspiration } from '@/data/content';
+import { contact, heroSlides, inspiration } from '@/data/content';
 import { fetchCatalogue } from '@/lib/catalogue';
+import { whatsappLink } from '@/lib/whatsapp';
 import type { Category, Product } from '@/types/catalogue';
 import { categoryImages } from '@/types/catalogue';
 
@@ -57,5 +58,23 @@ function HomePage({ slide, setSlide, categories, products, onNavigate, onSelect,
 function CataloguePage({ products, categories, categoryNames, activeCategory, setActiveCategory, search, setSearch, showFilters, setShowFilters, onSelect, onVisualize, catalogueError }: { products: Product[]; categories: Category[]; categoryNames: string[]; activeCategory: string; setActiveCategory: (value: string) => void; search: string; setSearch: (value: string) => void; showFilters: boolean; setShowFilters: (value: boolean) => void; onSelect: (product: Product) => void; onVisualize: (product: Product) => void; catalogueError: boolean }) { return <main className="catalogue-page"><div className="catalogue-hero"><span className="eyebrow">THE COLLECTION / 02</span><h1>Materials for<br /><em>meaningful spaces.</em></h1><p>Explore the Mohammedi edit — from architectural surfaces to the details that complete the room.</p></div><div className="catalogue-toolbar"><div className="search-box"><Search size={17} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search products, codes, sizes..." /></div><button className="filter-toggle" onClick={() => setShowFilters(!showFilters)}><Filter size={16} /> Filters</button></div><div className={`catalogue-layout ${showFilters ? 'show-filters' : ''}`}><aside className="filter-panel"><div className="filter-title">Browse by <X size={16} onClick={() => setShowFilters(false)} /></div>{categoryNames.map((name) => <button key={name} className={activeCategory === name ? 'active' : ''} onClick={() => { setActiveCategory(name); setShowFilters(false); }}>{name}<span>{name === 'All' ? products.length : categories.find((category) => category.name === name)?.sort_order ?? '—'}</span></button>)}</aside><div className="catalogue-results"><div className="results-top"><span>{products.length} pieces in the collection</span><span className="results-note">{catalogueError ? 'Showing the launch collection' : 'Live catalogue'}</span></div>{products.length ? <div className="product-grid">{products.map((product) => <ProductCard key={product.id} product={product} onSelect={onSelect} onVisualize={onVisualize} />)}</div> : <div className="empty-state"><Search size={30} /><h3>No matching pieces yet.</h3><p>Try a different search or browse another category.</p></div>}</div></div></main>; }
 
 function SectionHeading({ eyebrow, title, action, onAction }: { eyebrow: string; title: string; action: string; onAction: () => void }) { return <div className="section-heading"><div><span className="eyebrow">{eyebrow}</span><h2>{title}</h2></div><button className="text-button" onClick={onAction}>{action} <ArrowRight size={16} /></button></div>; }
-function FloatingActions({ onNavigate }: { onNavigate: (page: string) => void }) { return <div className="floating-actions"><button onClick={() => onNavigate('visualizer')}><Sparkles size={17} /><span>Visualizer</span></button><a href="#contact"><span className="whatsapp-dot" /> <span>Contact</span></a></div>; }
+function FloatingActions({ onNavigate }: { onNavigate: (page: string) => void }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="floating-actions">
+      <button onClick={() => onNavigate('visualizer')}><Sparkles size={17} /><span>Visualizer</span></button>
+      {open && (
+        <div className="contact-fan">
+          <a href={whatsappLink()} target="_blank" rel="noopener noreferrer"><MessageCircle size={16} /><span>WhatsApp</span></a>
+          <a href={`tel:+${contact.whatsapp}`}><Phone size={16} /><span>Call</span></a>
+          <a href={contact.facebookUrl} target="_blank" rel="noopener noreferrer"><Facebook size={16} /><span>Facebook</span></a>
+          <a href={contact.instagramUrl} target="_blank" rel="noopener noreferrer"><Instagram size={16} /><span>Instagram</span></a>
+        </div>
+      )}
+      <button onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label="Contact options">
+        {open ? <X size={17} /> : <span className="whatsapp-dot" />}<span>{open ? 'Close' : 'Contact'}</span>
+      </button>
+    </div>
+  );
+}
 export default App;

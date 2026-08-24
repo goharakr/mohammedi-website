@@ -1,4 +1,6 @@
-import { ArrowUpRight, Instagram, MapPin } from 'lucide-react';
+import { ArrowUpRight, Facebook, Instagram, Mail, MapPin, Phone } from 'lucide-react';
+import { contact } from '@/data/content';
+import { whatsappLink } from '@/lib/whatsapp';
 
 interface FooterProps { onNavigate: (page: string) => void; }
 
@@ -32,14 +34,15 @@ export function Footer({ onNavigate }: FooterProps) {
         </div>
         <div id="contact">
           <span className="footer-label">Visit</span>
-          <p><MapPin size={14} /> Kisumu, Kenya</p>
-          <p>Phone / WhatsApp<br /><span className="muted">Details coming soon</span></p>
+          <a href={contact.mapsUrl} target="_blank" rel="noopener noreferrer"><MapPin size={14} /> {contact.addressLabel}</a>
+          <a href={whatsappLink()} target="_blank" rel="noopener noreferrer"><Phone size={14} /> {contact.phoneDisplay}</a>
+          <a href={`mailto:${contact.email}`}><Mail size={14} /> {contact.email}</a>
         </div>
         <div>
           <span className="footer-label">Follow the studio</span>
-          <button onClick={() => goToSection('contact')}><Instagram size={14} /> Instagram</button>
-          <button onClick={() => goToSection('contact')}>Facebook</button>
-          <button onClick={() => goToSection('contact')}>Pinterest</button>
+          <a href={contact.instagramUrl} target="_blank" rel="noopener noreferrer"><Instagram size={14} /> Instagram</a>
+          <a href={contact.facebookUrl} target="_blank" rel="noopener noreferrer"><Facebook size={14} /> Facebook</a>
+          <a href={whatsappLink()} target="_blank" rel="noopener noreferrer"><Phone size={14} /> WhatsApp</a>
         </div>
       </div>
       <div className="footer-bottom">
