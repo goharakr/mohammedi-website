@@ -60,7 +60,7 @@ by itself.
 
 | Piece | Detail |
 |---|---|
-| Contacts | Import from phone contacts (pick from the OS contact picker) instead of retyping numbers. |
+| Contacts | Import from phone contacts once; after that, a **type-to-search field** — type "Ma" and matching contacts (e.g. all your Marias) show up in a dropdown, tap the right one. No re-typing numbers, no scrolling a long list. |
 | Booking record | Customer, item description, photo, sale price, amount paid/owed, order date, status (`booked` → `arrived` → `collected`). |
 | Notify button | One tap per customer → prefilled message → opens WhatsApp/SMS → you review and hit send. |
 | Message templates | 2–3 canned messages you write once (e.g. "ready for pickup", "reminder to pay balance"), with `{name}`, `{item}`, `{amount}` filled in automatically. Fully editable before sending, every time. |
@@ -73,30 +73,36 @@ link that opens WhatsApp with the text already typed.
 ## 4. Feature 2 — Supplier price → markup → currency → group post
 
 **Flow you described:**
-- Supplier messages you a cost, e.g. "$5".
-- You forward that message to the app (or type it in).
+- Supplier messages you a cost in USD, e.g. "$5".
+- You **copy-paste** that message into the app (no manual re-typing of
+  the number).
+- You tick a couple of preset options describing the item (see item
+  presets below), e.g. "Bracelet → Gold-plated → Zircon/American
+  diamond."
 - App applies your markup rule (e.g. "+$15") → you can also just tell it
   "add $15 to this one" if it varies.
-- App shows the result converted into **local shillings** (see open
-  question below on which currencies).
+- App converts the marked-up price to **Tanzanian Shilling (TSh) and
+  Kenyan Shilling (KSh)** and writes the full post text for you.
 - You get a ready-made post like:
-  `Ring — $20 (TSh 52,000 / KSh 2,600)`
+  `Gold-plated Bracelet with Zircon — $20 (TSh 52,000 / KSh 2,600)`
 - You post that to your WhatsApp groups — ideally the app does it, or at
   least gets you to one tap.
 - Replies come back in the group (e.g. Maria: "I want the bangles you
   posted today") — you turn that into a Feature 1 booking for Maria
-  without retyping the item/price, since the app already generated it.
+  without retyping the item/price, since the app already generated it,
+  using the same contact type-to-search from Feature 1.
 
 **What this needs:**
 
 | Piece | Detail |
 |---|---|
-| Price input | Type the cost, or forward/paste the supplier's WhatsApp text; the app pulls the number out of it. |
+| Price input | Paste the supplier's WhatsApp text in; the app pulls the USD number out of it. |
+| Item presets | A set of tickable fields you configure once and reuse per post — e.g. **Item type** (bracelet, ring, necklace, earrings...), **Material** (gold, gold-plated), **Stone** (none, zircon/American diamond, semi-precious, emerald, ruby, other). Ticking them assembles the item description automatically (e.g. "Gold-plated Bracelet with Zircon") instead of you typing it out each time. Presets are editable/extendable whenever you get a new item type. |
 | Markup rule | A default (e.g. always +$15) you can override per item; later, could support % markup too. |
-| Currency conversion | Convert USD → your local currencies. Either you enter/update the exchange rate yourself in Settings, or the app pulls a live rate from a currency API. Manual entry is simpler and more predictable for pricing. |
-| Message generator | Builds the post text from a template you control, always editable before sending — never auto-sent without your OK. |
+| Currency conversion | Convert USD → TSh and KSh. Either you enter/update the exchange rate yourself in Settings, or the app pulls a live rate from a currency API. Manual entry is simpler and more predictable for pricing. |
+| Message generator | Builds the full post text (item description + both prices) from a template you control, always editable before sending — never auto-sent without your OK. |
 | Posting to groups | See the WhatsApp constraint in §8 — this is the one part that **cannot** be fully "one click, zero taps in WhatsApp" today. |
-| "Claim" shortcut | Each posted item stays in the app as a pending item; when someone replies wanting it, you pick them from contacts and tap "book this item to them" — turns straight into a Feature 1 booking with the price already filled in. |
+| "Claim" shortcut | Each posted item stays in the app as a pending item; when someone replies wanting it, you find them with the contact search and tap "book this item to them" — turns straight into a Feature 1 booking with the description and price already filled in. |
 
 ## 5. Feature 3 — Expenses & profit tracking
 
@@ -186,21 +192,27 @@ send). Only consider Option B later, and only for 1:1 pickup
 notifications, if removing that last tap is worth the verification/cost
 overhead.
 
-## 9. Platform choice
+## 9. Platform choice — resolved: Android phone + laptop
 
-This determines a lot, so it needs your input:
-
-- **What phone do you use — Android or iPhone?** Android supports the
-  "receive a shared WhatsApp message/photo into the app" flow much more
-  simply (including from an installed web app), which matters for how
-  easily supplier messages, group replies, and photos get into the app.
-  iPhone needs a proper native app to do the same thing.
-- If it's just for your own use (not customer-facing), a lightweight
-  option is an installable **web app (PWA)** — reuses ordinary web
-  technology, can be installed to your home screen, and on Android can
-  receive shared content like a native app. If you're on iPhone, or want
-  a smoother "share into app" experience, a small native app (e.g. React
-  Native, so it can share code with a web version) is the safer bet.
+You confirmed you need this on both an **Android phone** and a
+**laptop**. That settles it cleanly: build it as a **web app**, ideally
+an installable **PWA (Progressive Web App)**:
+- On the **laptop**, it's just a website — open it in the browser, no
+  install needed, easiest place to do data entry (typing item presets,
+  reviewing profit totals, managing the advance ledger) with a keyboard
+  and a bigger screen.
+- On **Android**, the same app installs to your home screen like a real
+  app, and — because it's Android — it can register in the system
+  "Share" menu, so forwarding a supplier message or a photo from
+  WhatsApp straight into the app works there too (see §8).
+- One codebase, one place your data lives, used from either device —
+  no need for a separate native app per platform. (This also fits
+  naturally with this repo's existing stack, which is already a React +
+  Vite web app with a Supabase backend for data storage.)
+- Because you'll use it from two devices, the data (customers, bookings,
+  items, expenses, advance ledger) needs to live in the cloud rather than
+  only on one phone — so whatever you enter on your phone shows up on
+  the laptop and vice versa.
 
 ## 10. Data model (sketch)
 
@@ -272,19 +284,19 @@ ExchangeRate
 
 ## 12. Open questions for you
 
-1. Android, iPhone, or both? (changes the platform recommendation in §9)
-2. Which currencies exactly — Tanzanian Shilling (TSh) and Kenyan
-   Shilling (KSh)? Any others?
-3. For currency conversion: type in/update the rate yourself in Settings,
+Resolved so far: platform is Android + laptop as a web app (§9);
+currencies are USD in, TSh and KSh out (§4). Still open:
+
+1. For currency conversion: type in/update the rate yourself in Settings,
    or should the app fetch a live exchange rate automatically?
-4. Is the markup always a flat add-on (+$15), or does it vary by item
+2. Is the markup always a flat add-on (+$15), or does it vary by item
    type / sometimes a percentage?
-5. Expenses like transport/bank charges — do they usually apply to one
+3. Expenses like transport/bank charges — do they usually apply to one
    specific order, or are they more general monthly overhead you'd want
    split across everything sold that period?
-6. Do you use one supplier or several? (affects whether the advance
+4. Do you use one supplier or several? (affects whether the advance
    ledger needs to track multiple suppliers separately)
-7. Do you want this as its own standalone app, or does it make sense to
+5. Do you want this as its own standalone app, or does it make sense to
    fold it into an existing tool you already use?
 
 Once you confirm these, the next step would be a short spec for Phase 1
