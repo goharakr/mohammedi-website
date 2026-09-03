@@ -83,10 +83,17 @@ link that opens WhatsApp with the text already typed.
   "add $15 to this one" if it varies.
 - App converts the marked-up price to **Tanzanian Shilling (TSh) and
   Kenyan Shilling (KSh)** and writes the full post text for you.
+- You have exactly two destination groups — **Trendyware Tanzania** and
+  **Trendyware Kenya** — so you pick which one (or both) this item is
+  for, and the app writes the matching post: the Tanzania group gets a
+  post priced in TSh, the Kenya group gets one priced in KSh (posting to
+  both just gives you both texts, one per group, instead of guessing
+  which currency to lead with).
 - You get a ready-made post like:
-  `Gold-plated Bracelet with Zircon — $20 (TSh 52,000 / KSh 2,600)`
-- You post that to your WhatsApp groups — ideally the app does it, or at
-  least gets you to one tap.
+  `Gold-plated Bracelet with Zircon — $20 (TSh 52,000)` for Tanzania, and
+  `Gold-plated Bracelet with Zircon — $20 (KSh 2,600)` for Kenya.
+- You post that to the relevant WhatsApp group(s) — ideally the app does
+  it, or at least gets you to one tap.
 - Replies come back in the group (e.g. Maria: "I want the bangles you
   posted today") — you turn that into a Feature 1 booking for Maria
   without retyping the item/price, since the app already generated it,
@@ -98,10 +105,11 @@ link that opens WhatsApp with the text already typed.
 |---|---|
 | Price input | Paste the supplier's WhatsApp text in; the app pulls the USD number out of it. |
 | Item presets | A set of tickable fields you configure once and reuse per post — e.g. **Item type** (bracelet, ring, necklace, earrings...), **Material** (gold, gold-plated), **Stone** (none, zircon/American diamond, semi-precious, emerald, ruby, other). Ticking them assembles the item description automatically (e.g. "Gold-plated Bracelet with Zircon") instead of you typing it out each time. Presets are editable/extendable whenever you get a new item type. |
+| Target group(s) | Tick **Tanzania**, **Kenya**, or both per item — controls which currency (or both) the generated post uses. The two groups and their currencies are set up once in Settings, not re-picked every time. |
 | Markup rule | A default (e.g. always +$15) you can override per item; later, could support % markup too. |
 | Currency conversion | Convert USD → TSh and KSh. Either you enter/update the exchange rate yourself in Settings, or the app pulls a live rate from a currency API. Manual entry is simpler and more predictable for pricing. |
 | Message generator | Builds the full post text (item description + both prices) from a template you control, always editable before sending — never auto-sent without your OK. |
-| Posting to groups | See the WhatsApp constraint in §8 — this is the one part that **cannot** be fully "one click, zero taps in WhatsApp" today. |
+| Posting to groups | See the WhatsApp constraint in §9 — this is the one part that **cannot** be fully "one click, zero taps in WhatsApp" today. |
 | "Claim" shortcut | Each posted item stays in the app as a pending item; when someone replies wanting it, you find them with the contact search and tap "book this item to them" — turns straight into a Feature 1 booking with the description and price already filled in. |
 
 ## 5. Feature 3 — Expenses & profit tracking
@@ -114,6 +122,7 @@ making**, after costs beyond just the item price:
 | Expense log | Record things like transport, bank/transfer charges, packaging — either attached to a specific order or as general overhead for a period. |
 | Per-item profit | `sale price − supplier cost − expenses allocated to it` shown per booking. |
 | Overall profit view | Totals over a chosen period (e.g. this month): total sales, total cost, total expenses, net profit. |
+| Per-person profit | Since you and your three daughters (§6) each sell and keep your own earnings, the same totals broken down **by who made the sale** — "Susanna's profit this month," "Rashida's," "Alifia's," "Ramla's" — not just one combined number. |
 
 This reuses the same booking records from Feature 1 — the cost price is
 already captured there (from Feature 2), so profit-per-item is mostly
@@ -149,9 +158,38 @@ your phone's camera roll — so they:
 
 Photos get into the app either by taking/picking one directly in-app, or
 — on Android — by forwarding a photo from WhatsApp straight to the app
-via the system "Share" menu (see §8).
+via the system "Share" menu (see §9). Since one item photo can have
+several customers waiting on it (e.g. five people all ordered the same
+bangle style), tapping a photo shows **every customer linked to it** —
+so once the box arrives, you open the photo and immediately see who
+gets which piece, instead of trying to remember or dig through chats.
 
-## 8. The WhatsApp constraint (read this before we design further)
+## 8. Feature 6 — Multiple users (you + three daughters)
+
+**Flow you described:**
+- Four people use this: you (Ramla) and your three daughters (Susanna,
+  Rashida, Alifia). Everyone sells the same stuff, through the same
+  supplier, into the same two groups — but each of you keeps your own
+  earnings/share, so whatever one of you sells needs to be recorded
+  under her own name, not lumped together.
+- You explicitly said security isn't a concern here — this is family,
+  not customers, so a simple login (not bank-grade security) is fine.
+
+**What this needs:**
+
+| Piece | Detail |
+|---|---|
+| Accounts | Four simple logins — e.g. each person picks her name from a list and sets any password she likes (shared or different, doesn't matter). No need for complex permissions or roles; everyone can do everything. |
+| Attribution | Every item posted and every booking made records **who did it** (Susanna, Rashida, Alifia, or Ramla), so it's always clear whose sale it was — this is what powers the per-person profit view in Feature 3. |
+| Shared data | Customers, the supplier, the two groups (Tanzania/Kenya), item presets, and message templates are the same for everyone — no need to re-enter any of that per user. |
+| Shared vs. own bookings | Because the customer list is shared, any of you could technically see any customer — but bookings/sales themselves are still tagged to whoever made them, so "my sales" vs. "everyone's sales" are both easy views. |
+
+Since this is a shared family business tool rather than customer-facing
+software, this is the one area where we can deliberately keep things
+simple (no password resets, no permission levels) rather than over-build
+security nobody asked for.
+
+## 9. The WhatsApp constraint (read this before we design further)
 
 This affects Features 2 and 3 especially, so it's worth being upfront
 about what's actually possible:
@@ -192,7 +230,7 @@ send). Only consider Option B later, and only for 1:1 pickup
 notifications, if removing that last tap is worth the verification/cost
 overhead.
 
-## 9. Platform choice — resolved: Android phone + laptop
+## 10. Platform choice — resolved: Android phone + laptop
 
 You confirmed you need this on both an **Android phone** and a
 **laptop**. That settles it cleanly: build it as a **web app**, ideally
@@ -204,7 +242,7 @@ an installable **PWA (Progressive Web App)**:
 - On **Android**, the same app installs to your home screen like a real
   app, and — because it's Android — it can register in the system
   "Share" menu, so forwarding a supplier message or a photo from
-  WhatsApp straight into the app works there too (see §8).
+  WhatsApp straight into the app works there too (see §9).
 - One codebase, one place your data lives, used from either device —
   no need for a separate native app per platform. (This also fits
   naturally with this repo's existing stack, which is already a React +
@@ -214,9 +252,12 @@ an installable **PWA (Progressive Web App)**:
   only on one phone — so whatever you enter on your phone shows up on
   the laptop and vice versa.
 
-## 10. Data model (sketch)
+## 11. Data model (sketch)
 
 ```
+User (Ramla, Susanna, Rashida, Alifia)
+  id, name, login
+
 Customer
   id, name, phone, notes
 
@@ -226,17 +267,20 @@ Supplier
 SupplierAdvance
   id, supplier_id, amount, sent_at, balance_remaining
 
-Item (a posted/priced item, before anyone claims it)
-  id, description, photo_url,
+Group (Trendyware Tanzania, Trendyware Kenya)
+  id, name, currency_code
+
+Item (a posted/priced item — one photo can serve several Bookings)
+  id, description, photo_url, group_id,
   supplier_cost, supplier_advance_id (nullable),
   markup_applied, sale_price,
-  posted_at
+  posted_by (User), posted_at
 
 Booking (an Item claimed by a Customer)
   id, item_id, customer_id,
   amount_paid, amount_owed,
   status: booked | arrived | collected,
-  ordered_at, arrived_at
+  sold_by (User), ordered_at, arrived_at
 
 Expense
   id, label (e.g. "transport", "bank charges"),
@@ -252,26 +296,28 @@ ExchangeRate
   currency_code, rate_to_usd, updated_at
 ```
 
-## 11. Suggested phases
+## 12. Suggested phases
 
 **Phase 1 — MVP (customer bookings)**
-- Add/import contacts, create bookings, mark arrived, one-tap
-  prefilled WhatsApp/SMS message to a customer, basic paid/owed tracking,
-  attach a photo per booking.
+- Accounts for all four of you, add/import contacts, create bookings,
+  mark arrived, one-tap prefilled WhatsApp/SMS message to a customer,
+  basic paid/owed tracking, attach a photo per booking.
 
 **Phase 2 — Pricing & posting tool**
-- Manual price entry → markup → currency conversion → editable message →
-  share sheet to post to a group → "claim" an item into a booking when
-  someone replies wanting it.
+- Manual price entry → markup → currency conversion (per Tanzania/Kenya
+  group) → editable message → share sheet to post to a group → "claim"
+  an item into a booking when someone replies wanting it.
 
 **Phase 3 — Money tracking**
-- Expense log and profit view (Feature 3).
+- Expense log and profit view, including the per-person breakdown
+  (Feature 3).
 - Supplier advance ledger with auto-deduction per order (Feature 4).
 
 **Phase 4 — Quality of life**
 - Receive-shared-message/photo support (Android first) so you can
   forward straight from WhatsApp instead of retyping (Feature 5, and
   faster input for Feature 2's item posting).
+- Tap a photo to see every customer linked to it, for sorting arrivals.
 - Overdue-payment reminders, simple search/filter over bookings.
 - AI-assisted parsing: paste a messy supplier message or group reply and
   have the app pull out item/price/customer automatically (the "agent"
@@ -280,12 +326,13 @@ ExchangeRate
 **Phase 5 — optional, only if needed**
 - WhatsApp Business Cloud API for fully automatic 1:1 pickup
   notifications (does not extend to group posting or reading group
-  replies — see §8).
+  replies — see §9).
 
-## 12. Open questions for you
+## 13. Open questions for you
 
-Resolved so far: platform is Android + laptop as a web app (§9);
-currencies are USD in, TSh and KSh out (§4). Still open:
+Resolved so far: platform is Android + laptop as a web app (§10);
+currencies are USD in, TSh/KSh out per group (§4); one shared supplier
+and four user accounts (§8). Still open:
 
 1. For currency conversion: type in/update the rate yourself in Settings,
    or should the app fetch a live exchange rate automatically?
@@ -294,9 +341,7 @@ currencies are USD in, TSh and KSh out (§4). Still open:
 3. Expenses like transport/bank charges — do they usually apply to one
    specific order, or are they more general monthly overhead you'd want
    split across everything sold that period?
-4. Do you use one supplier or several? (affects whether the advance
-   ledger needs to track multiple suppliers separately)
-5. Do you want this as its own standalone app, or does it make sense to
+4. Do you want this as its own standalone app, or does it make sense to
    fold it into an existing tool you already use?
 
 Once you confirm these, the next step would be a short spec for Phase 1
