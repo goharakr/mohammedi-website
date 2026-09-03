@@ -252,7 +252,7 @@ an installable **PWA (Progressive Web App)**:
   only on one phone — so whatever you enter on your phone shows up on
   the laptop and vice versa.
 
-## 11. App structure — pages, dashboard, and the ledger
+## 11. App structure — pages, dashboard, ledger, report, and settings
 
 You want this **organized into a small number of clear pages**, not
 everything crammed onto one screen. Here's the structure:
@@ -271,31 +271,68 @@ with an option to switch to "everyone's"):
 4. **Delivery** — once items arrive: mark items as arrived, open a photo
    to see every customer waiting on it (Feature 5), one-tap "notify
    customer" messages, mark each as collected.
+5. **Report** — see below; the one place all your ledgers come together.
+6. **Settings** — see below; one-time setup + the app's configuration.
 
-Each page stays focused on its own job — Sales is only about pricing and
-posting, Bookings is only the list of orders, Delivery is only about
-what's arrived and getting it to people. Nothing about money/profit
-history clutters those pages directly — that all lives in the ledger.
+Each of Sales/Bookings/Delivery stays focused on its own job — nothing
+about money/profit history clutters them directly. Historical detail
+lives in the ledger.
 
-**The ledger — one popup, available from every page:**
+**The ledger — attached to every page, editable, and pulled together in
+Report:**
 
-- A small **"View Ledger"** button at the top of every page.
+- Every page (Dashboard, Sales, Bookings, Delivery) has its own small
+  **"View Ledger"** button at the top, scoped to that page's own
+  activity — e.g. the Delivery page's ledger shows only delivery
+  entries, so you're never hunting on another page for something that
+  belongs here.
 - Tapping it opens a **full-screen overlay** — no sidebar, no drawer, it
   covers the whole screen so you can see everything at once.
-- It shows your activity for whatever period you choose: what you've
-  sold, cost, profit, and so on.
+- **You can edit or delete any entry directly from the ledger** — if
+  something was logged wrong, you fix it right there, not by hunting
+  down the original booking/sale elsewhere.
 - Filters are **dropdowns** (not rows of small buttons), and can be
-  combined:
-  - **Item** — narrow to one item/style.
-  - **Debt** — narrow to unpaid/owing orders only (read "depth wise" as
-    "debt wise" — flag if that's not what you meant).
-  - **Contact** — narrow to one customer.
-  - **Date** — a dropdown with presets: **This week / Last week / This
-    month / Last month / Custom range** (pick a from-date and a to-date
-    for anything else).
+  combined: **Item**, **Debt** (unpaid/owing only — read "depth wise" as
+  "debt wise," flag if that's not what you meant), **Contact**, and
+  **Date** (dropdown: **Today / This week / Last week / This month /
+  Last month / Custom range**, the last one taking a from-date and
+  to-date).
 
-So, for example: "unpaid orders for Maria this month" is Contact +
-Debt + Date, all from the same one dropdown-driven screen.
+**Report page — every ledger in one place:**
+
+- Pulls together the ledgers from all pages into a single view, instead
+  of checking each page separately.
+- **Category checkboxes** — small tick-boxes for **Sales**, **Bookings**,
+  **Delivery** (and so on); tick just "Delivery" and only delivery
+  entries show, tick nothing/everything and you see it all combined.
+- The same **Item** and **Contact** filters as the per-page ledgers.
+- The same **Date** dropdown (Today / This week / Last week / This month
+  / Last month / Custom range).
+- Same editing rules as any ledger — fix a wrong entry right from here.
+
+**Settings page — starting balances + configuration:**
+
+Before you start really using the app, you enter your business's
+**current real-world state** so the app isn't starting from zero when
+you already have money and orders in motion:
+
+| Starting value | What it captures |
+|---|---|
+| Supplier advance already given | Whatever balance you've already sent your supplier before the app existed (feeds Feature 4's ledger). |
+| Cash already in hand | Money you're currently holding from past sales. |
+| Sales already made | Historical total sales, so this month/lifetime totals aren't missing your pre-app history. |
+| Customer amounts owed | What customers already owe you from before the app started (feeds the Debt filter). |
+| Expenses so far | Whatever transport/bank-charge totals you've already incurred. |
+| Starting profit | Not entered by you — the app **calculates and shows** this from the four figures above, so you get a sanity-check number rather than typing it in yourself. |
+
+All of these are one-time manual entries (typed in once, editable later
+if you realize a number was off) — this is what makes the Dashboard and
+Report accurate from day one instead of pretending the business started
+at zero.
+
+Settings is also where the shared configuration lives day-to-day: the
+two groups and their currencies, the default markup rule, exchange rate
+(manual or live — open question), item presets, and message templates.
 
 ## 12. Data model (sketch)
 
@@ -339,21 +376,31 @@ MessageTemplate
 
 ExchangeRate
   currency_code, rate_to_usd, updated_at
+
+OpeningBalance (one-time Settings entry, per starting figure)
+  id, label (supplier_advance | cash_in_hand | past_sales |
+  customer_debt | past_expenses), amount, entered_at
 ```
+
+Every Item/Booking/Expense/SupplierAdvance row above also needs to
+support edit and delete from the ledger UI, not just create — that's a
+first-class requirement, not an afterthought.
 
 ## 13. Suggested phases
 
-**Phase 1 — MVP (structure + bookings)**
-- The four core pages from §11 (Dashboard, Sales, Bookings, Delivery)
-  built from the start, so the app never feels like it needs
+**Phase 1 — MVP (structure + bookings + settings)**
+- The six pages from §11 (Dashboard, Sales, Bookings, Delivery, Report,
+  Settings) built from the start, so the app never feels like it needs
   reorganizing later — features get slotted into these pages, not
   bolted on wherever's convenient.
+- Settings' opening-balance entry (supplier advance, cash in hand, past
+  sales, customer debt, past expenses) so the app reflects real
+  business state from day one, not zero.
 - Accounts for all four of you, add/import contacts, create bookings,
   mark arrived, one-tap prefilled WhatsApp/SMS message to a customer,
   basic paid/owed tracking, attach a photo per booking.
 - Dashboard shows cost/selling price, profit, this month's sales,
-  pending orders — even with placeholder data until later phases feed
-  it fully.
+  pending orders — fed by the opening balances plus whatever's entered.
 
 **Phase 2 — Pricing & posting tool**
 - Manual price entry → markup → currency conversion (per Tanzania/Kenya
@@ -361,13 +408,15 @@ ExchangeRate
   an item into a booking when someone replies wanting it. Lives on the
   Sales page.
 
-**Phase 3 — Money tracking**
+**Phase 3 — Ledger, Report, and money tracking**
 - Expense log and profit view, including the per-person breakdown
   (Feature 3).
 - Supplier advance ledger with auto-deduction per order (Feature 4).
-- The **View Ledger** overlay (§11) — full-screen popup, dropdown
-  filters for item/debt/contact/date — added once there's enough data
-  in the system to make it useful.
+- The per-page **View Ledger** overlay (§11) — full-screen popup,
+  editable/deletable entries, dropdown filters for item/debt/contact/
+  date.
+- The **Report** page — every ledger combined, with category checkboxes
+  (Sales/Bookings/Delivery) plus the same item/contact/date filters.
 
 **Phase 4 — Quality of life**
 - Receive-shared-message/photo support (Android first) so you can
