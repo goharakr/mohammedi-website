@@ -1,18 +1,18 @@
-# Jewelry Preorder App — Planning Document
+# Trendy Wear App — Planning Document
 
 Status: **planning only** — nothing in this document has been built yet.
-This is a plan for a separate app/tool to run your online, preorder-based
-jewelry business. It is not tied to the tiles/stone catalogue website in
-this repo; it lives here only because this repo is where the planning
-branch was created.
+This is a plan for a separate app/tool to run **Trendy Wear**, your
+online, preorder-based jewelry business. It is not tied to the
+tiles/stone catalogue website in this repo; it lives here only because
+this repo is where the planning branch was created.
 
 ## 1. The business, in one paragraph
 
-You sell jewelry online, no physical shop. There's no single product
-line/brand — every sale is a one-off item (a bracelet, a ring, whatever
-someone orders). You buy on preorder from a supplier, sometimes against
-an advance you've already paid her, and it takes about a month to
-arrive. You post items to WhatsApp groups at a marked-up price, people
+Trendy Wear sells jewelry online, no physical shop. There's no single
+product line — every sale is a one-off item (a bracelet, a ring,
+whatever someone orders). You buy on preorder from a supplier, sometimes
+against an advance you've already paid her, and it takes about a month
+to arrive. You post items to WhatsApp groups at a marked-up price, people
 reply if they want one, and from there you need to track: who ordered
 what, what it cost you, what you sold it for, who's paid, what you spent
 on top (transport, bank charges), and how your supplier advance is being
@@ -66,6 +66,7 @@ by itself.
 | Message templates | 2–3 canned messages you write once (e.g. "ready for pickup", "reminder to pay balance"), with `{name}`, `{item}`, `{amount}` filled in automatically. Fully editable before sending, every time. |
 | Payment tracking | Mark paid/unpaid/partial per booking; a running list of "who still owes me money," with a simple paid/not-paid toggle. |
 | Views | A simple list: active bookings, arrived-but-not-collected, overdue payments. |
+| Customer profile | Open a customer to see: **her own details** you add freely (e.g. "wears size 7 ring," "2.5 size bangles," any note you want — free-form fields, not a fixed form), and her **purchase history** — every past booking (item, photo/thumbnail, price, date) she's ever made with you, so opening "Maria" shows everything Maria has bought, not just her current order. |
 
 No WhatsApp automation is required here — just data entry plus a deep
 link that opens WhatsApp with the text already typed.
@@ -83,8 +84,8 @@ link that opens WhatsApp with the text already typed.
   "add $15 to this one" if it varies.
 - App converts the marked-up price to **Tanzanian Shilling (TSh) and
   Kenyan Shilling (KSh)** and writes the full post text for you.
-- You have exactly two destination groups — **Trendyware Tanzania** and
-  **Trendyware Kenya** — so you pick which one (or both) this item is
+- You have exactly two destination groups — **Trendy Wear Tanzania** and
+  **Trendy Wear Kenya** — so you pick which one (or both) this item is
   for, and the app writes the matching post: the Tanzania group gets a
   post priced in TSh, the Kenya group gets one priced in KSh (posting to
   both just gives you both texts, one per group, instead of guessing
@@ -164,6 +165,22 @@ bangle style), tapping a photo shows **every customer linked to it** —
 so once the box arrives, you open the photo and immediately see who
 gets which piece, instead of trying to remember or dig through chats.
 
+**Keeping storage under control:**
+
+You raised storage as a real concern, so two things are built in from
+the start rather than left to run wild:
+- **Only a compressed preview is stored**, not the original full-size
+  photo — enough to recognize the item, at a fraction of the file size.
+- **Photos get deleted once a booking is marked "collected"** on the
+  Delivery page — the app asks first ("Delete this item's photo now
+  that it's delivered?"), and only the photo goes; the booking record
+  itself (customer, item description, price, dates) stays forever, so
+  Customer profile history (§3) and the Report still show everything —
+  they just won't have a picture to go with an old, finished order.
+- This behavior (ask every time / always auto-delete on collection /
+  never delete) is a toggle in Settings, since you may want to try it
+  one way and change your mind.
+
 ## 8. Feature 6 — Multiple users (you + three daughters)
 
 **Flow you described:**
@@ -179,7 +196,7 @@ gets which piece, instead of trying to remember or dig through chats.
 
 | Piece | Detail |
 |---|---|
-| Accounts | Four simple logins — e.g. each person picks her name from a list and sets any password she likes (shared or different, doesn't matter). No need for complex permissions or roles; everyone can do everything. |
+| Accounts | Four simple logins — each person picks her name from a list and sets a **4-digit PIN** (shared or different across the four of you, doesn't matter) — no letters, symbols, or complexity rules. No need for complex permissions or roles; everyone can do everything. |
 | Attribution | Every item posted and every booking made records **who did it** (Susanna, Rashida, Alifia, or Ramla), so it's always clear whose sale it was — this is what powers the per-person profit view in Feature 3. |
 | Shared data | Customers, the supplier, the two groups (Tanzania/Kenya), item presets, and message templates are the same for everyone — no need to re-enter any of that per user. |
 | Shared vs. own bookings | Because the customer list is shared, any of you could technically see any customer — but bookings/sales themselves are still tagged to whoever made them, so "my sales" vs. "everyone's sales" are both easy views. |
@@ -354,21 +371,24 @@ two groups and their currencies, the default markup rule, exchange rate
 (manual or live — open question), item presets, and message templates.
 
 Settings also covers **account-level** items:
-- **Change password** — each of the four of you can change your own
-  login password here.
+- **Change PIN** — each of the four of you can change your own 4-digit
+  login PIN here, nothing more complex than that.
 - **Currency reference rates** — since every ledger and the Report page
   let you view figures in KSh, TSh, or USD on demand (see above), the
   USD↔KSh↔TSh exchange rates used for those conversions are set/updated
   here, in one place, rather than per-screen.
+- **Photo retention** (§7) — ask each time / always delete / never
+  delete a photo once its booking is marked collected.
 
 ## 12. Data model (sketch)
 
 ```
 User (Ramla, Susanna, Rashida, Alifia)
-  id, name, login, password
+  id, name, login, pin (4 digits)
 
 Customer
-  id, name, phone, notes
+  id, name, phone,
+  preferences (free-form: ring size, bangle size, etc.), notes
 
 Supplier
   id, name
@@ -376,11 +396,12 @@ Supplier
 SupplierAdvance
   id, supplier_id, amount, sent_at, balance_remaining
 
-Group (Trendyware Tanzania, Trendyware Kenya)
+Group (Trendy Wear Tanzania, Trendy Wear Kenya)
   id, name, currency_code
 
 Item (a posted/priced item — one photo can serve several Bookings)
-  id, description, photo_url, group_id,
+  id, description, preview_photo_url (compressed, deleted on
+  collection per Settings), group_id,
   supplier_cost, supplier_advance_id (nullable),
   markup_applied, sale_price,
   posted_by (User), posted_at
