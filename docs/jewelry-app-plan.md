@@ -112,6 +112,7 @@ link that opens WhatsApp with the text already typed.
 | Message generator | Builds the full post text (item description + both prices) from a template you control, always editable before sending — never auto-sent without your OK. |
 | Posting to groups | See the WhatsApp constraint in §9 — this is the one part that **cannot** be fully "one click, zero taps in WhatsApp" today. |
 | "Claim" shortcut | Each posted item stays in the app as a pending item; when someone replies wanting it, you find them with the contact search and tap "book this item to them" — turns straight into a Feature 1 booking with the description and price already filled in. |
+| Color/variant grouping | If the supplier sends the same item in several colors at the same price, they're priced and posted as **one item with several photos**, not repeated per color — see §7 for the full batch-photo workflow this is built around. |
 
 ## 5. Feature 3 — Expenses & profit tracking
 
@@ -174,17 +175,32 @@ Android's share menu isn't limited to one photo at a time — you can
   they're imported in one go.
 - Either way, this is a **batch import**, not a per-photo chore.
 
-**Turning a batch of photos into priced posts:**
-- After importing, the app gives you a **quick one-by-one tagging
-  screen**: the next photo shows, you tick its item presets (bracelet,
-  gold-plated, stone...) and paste/type its price, then it moves to the
-  next photo automatically — a fast stack to flip through rather than
-  fully separate screens per item.
-- Since one item photo can have several customers waiting on it (e.g.
-  five people all ordered the same bangle style), tapping a photo later
-  shows **every customer linked to it** — so once the box arrives, you
-  open the photo and immediately see who gets which piece, instead of
-  trying to remember or dig through chats.
+**Turning a batch of photos into priced posts — grouped, not per-photo:**
+
+The real problem you raised: 10 of those photos might be the *same*
+bracelet in different colors (blue, yellow, green...) at the *same*
+price — pricing them one at a time would be just as tedious as
+forwarding them one at a time. So the tagging step works on **groups**,
+not individual photos:
+- After the batch import lands, you see a grid of all the day's photos.
+- You **multi-select every photo that's the same item** (all 10 color
+  variants of that bracelet) and set the item presets + **one price**
+  for the whole group in a single action.
+- That becomes **one item** carrying all 10 photos as its color options,
+  ready to post as one message: "Bracelet — $20 (TSh 52,000) — available
+  in blue, yellow, green..." with the photos attached.
+- You repeat this grouping step only once per *distinct* product in the
+  batch — 50 photos that are really 8 different bracelets means 8
+  pricing actions, not 50.
+- When someone orders, you note which color/variant she wants — the
+  booking points at that specific photo within the item, so Delivery
+  still knows exactly which piece is Maria's (see below).
+- Since an item can have several customers waiting on it (different
+  people wanting different colors of the *same* item, or several people
+  wanting the *same* color), tapping a photo later shows **every
+  customer linked to it** — so once the box arrives, you open the photo
+  and immediately see who gets which piece, instead of trying to
+  remember or dig through chats.
 
 **Keeping storage under control:**
 
@@ -423,15 +439,20 @@ SupplierAdvance
 Group (Trendy Wear Tanzania, Trendy Wear Kenya)
   id, name, currency_code
 
-Item (a posted/priced item — one photo can serve several Bookings)
-  id, description, preview_photo_url (compressed, deleted on
-  collection per Settings), group_id,
+Item (one price/description, priced as a GROUP — see §7 —
+  covering every color/variant photo of the same product)
+  id, description, group_id,
   supplier_cost, supplier_advance_id (nullable),
   markup_applied, sale_price,
   posted_by (User), posted_at
 
-Booking (an Item claimed by a Customer)
-  id, item_id, customer_id,
+ItemPhoto (one row per color/variant photo within an Item)
+  id, item_id, preview_photo_url (compressed, deleted on
+  collection per Settings), variant_label (e.g. "blue", nullable)
+
+Booking (an Item, in one specific variant, claimed by a Customer)
+  id, item_id, item_photo_id (which color/variant she wants),
+  customer_id,
   amount_paid, amount_owed,
   status: booked | arrived | collected,
   sold_by (User), ordered_at, arrived_at
