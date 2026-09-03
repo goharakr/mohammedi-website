@@ -252,7 +252,52 @@ an installable **PWA (Progressive Web App)**:
   only on one phone — so whatever you enter on your phone shows up on
   the laptop and vice versa.
 
-## 11. Data model (sketch)
+## 11. App structure — pages, dashboard, and the ledger
+
+You want this **organized into a small number of clear pages**, not
+everything crammed onto one screen. Here's the structure:
+
+**Main pages** (each of the four of you sees your own data by default,
+with an option to switch to "everyone's"):
+
+1. **Dashboard** (the home page/first screen) — the at-a-glance summary:
+   total cost price, total selling price, total profit, how much you've
+   sold this month, and your pending orders (bookings not yet collected).
+2. **Sales** — the supplier → group tool from Feature 2: paste the
+   supplier's price, tick the item presets, pick the group(s), review/
+   edit the generated message, send it.
+3. **Bookings** — everything currently booked from Feature 1: customer,
+   item, price, and paid/owed status, all in one list.
+4. **Delivery** — once items arrive: mark items as arrived, open a photo
+   to see every customer waiting on it (Feature 5), one-tap "notify
+   customer" messages, mark each as collected.
+
+Each page stays focused on its own job — Sales is only about pricing and
+posting, Bookings is only the list of orders, Delivery is only about
+what's arrived and getting it to people. Nothing about money/profit
+history clutters those pages directly — that all lives in the ledger.
+
+**The ledger — one popup, available from every page:**
+
+- A small **"View Ledger"** button at the top of every page.
+- Tapping it opens a **full-screen overlay** — no sidebar, no drawer, it
+  covers the whole screen so you can see everything at once.
+- It shows your activity for whatever period you choose: what you've
+  sold, cost, profit, and so on.
+- Filters are **dropdowns** (not rows of small buttons), and can be
+  combined:
+  - **Item** — narrow to one item/style.
+  - **Debt** — narrow to unpaid/owing orders only (read "depth wise" as
+    "debt wise" — flag if that's not what you meant).
+  - **Contact** — narrow to one customer.
+  - **Date** — a dropdown with presets: **This week / Last week / This
+    month / Last month / Custom range** (pick a from-date and a to-date
+    for anything else).
+
+So, for example: "unpaid orders for Maria this month" is Contact +
+Debt + Date, all from the same one dropdown-driven screen.
+
+## 12. Data model (sketch)
 
 ```
 User (Ramla, Susanna, Rashida, Alifia)
@@ -296,22 +341,33 @@ ExchangeRate
   currency_code, rate_to_usd, updated_at
 ```
 
-## 12. Suggested phases
+## 13. Suggested phases
 
-**Phase 1 — MVP (customer bookings)**
+**Phase 1 — MVP (structure + bookings)**
+- The four core pages from §11 (Dashboard, Sales, Bookings, Delivery)
+  built from the start, so the app never feels like it needs
+  reorganizing later — features get slotted into these pages, not
+  bolted on wherever's convenient.
 - Accounts for all four of you, add/import contacts, create bookings,
   mark arrived, one-tap prefilled WhatsApp/SMS message to a customer,
   basic paid/owed tracking, attach a photo per booking.
+- Dashboard shows cost/selling price, profit, this month's sales,
+  pending orders — even with placeholder data until later phases feed
+  it fully.
 
 **Phase 2 — Pricing & posting tool**
 - Manual price entry → markup → currency conversion (per Tanzania/Kenya
   group) → editable message → share sheet to post to a group → "claim"
-  an item into a booking when someone replies wanting it.
+  an item into a booking when someone replies wanting it. Lives on the
+  Sales page.
 
 **Phase 3 — Money tracking**
 - Expense log and profit view, including the per-person breakdown
   (Feature 3).
 - Supplier advance ledger with auto-deduction per order (Feature 4).
+- The **View Ledger** overlay (§11) — full-screen popup, dropdown
+  filters for item/debt/contact/date — added once there's enough data
+  in the system to make it useful.
 
 **Phase 4 — Quality of life**
 - Receive-shared-message/photo support (Android first) so you can
@@ -328,17 +384,21 @@ ExchangeRate
   notifications (does not extend to group posting or reading group
   replies — see §9).
 
-## 13. Open questions for you
+## 14. Open questions for you
 
 Resolved so far: platform is Android + laptop as a web app (§10);
 currencies are USD in, TSh/KSh out per group (§4); one shared supplier
-and four user accounts (§8). Still open:
+and four user accounts (§8); page structure and ledger filters (§11).
+Still open:
 
-1. For currency conversion: type in/update the rate yourself in Settings,
+1. In §11, "depth wise" was read as **"debt wise"** (filter the ledger to
+   unpaid/owing orders) — confirm that's right, or tell me what you
+   actually meant.
+2. For currency conversion: type in/update the rate yourself in Settings,
    or should the app fetch a live exchange rate automatically?
-2. Is the markup always a flat add-on (+$15), or does it vary by item
+3. Is the markup always a flat add-on (+$15), or does it vary by item
    type / sometimes a percentage?
-3. Expenses like transport/bank charges — do they usually apply to one
+4. Expenses like transport/bank charges — do they usually apply to one
    specific order, or are they more general monthly overhead you'd want
    split across everything sold that period?
 4. Do you want this as its own standalone app, or does it make sense to
