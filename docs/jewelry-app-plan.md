@@ -271,18 +271,36 @@ with an option to switch to "everyone's"):
 4. **Delivery** — once items arrive: mark items as arrived, open a photo
    to see every customer waiting on it (Feature 5), one-tap "notify
    customer" messages, mark each as collected.
-5. **Report** — see below; the one place all your ledgers come together.
-6. **Settings** — see below; one-time setup + the app's configuration.
+5. **Expenses** — see below; every outgoing cost, in one dedicated page.
+6. **Report** — see below; the one place all your ledgers come together.
+7. **Settings** — see below; one-time setup + the app's configuration.
 
-Each of Sales/Bookings/Delivery stays focused on its own job — nothing
-about money/profit history clutters them directly. Historical detail
-lives in the ledger.
+Each of Sales/Bookings/Delivery/Expenses stays focused on its own job —
+nothing about money/profit history clutters them directly. Historical
+detail lives in the ledger.
+
+**Expenses page — every outgoing cost:**
+
+You'd left this out earlier, so to be explicit: this is its own page,
+separate from Sales/Bookings/Delivery, for anything money goes *out* for
+that isn't the supplier's per-item cost:
+
+| Expense type | Detail |
+|---|---|
+| Transport / parcel charges | The cost of getting a shipment to you, with **due date** (when it's expected) and **arrived date** (when it actually came) recorded, so you get a breakdown of shipment timing alongside the cost. |
+| Supplier advance sent | Logging that you sent your supplier an advance (e.g. $500) happens here — it's both an expense (cash going out) and, at the same time, feeds the Feature 4 advance balance so it can be deducted from as you place orders against it. One entry, two effects. |
+| Currency exchange fees | Whatever a bank/money-transfer charges you to convert currency when paying your supplier. |
+| Other local/delivery charges | Anything else — packaging, local courier, etc. — as free-form entries so nothing is forced into a category that doesn't fit. |
+
+All of these show up in this page's own ledger (editable/deletable, same
+as everywhere else) and roll up into the profit calculations in Feature
+3 and the Dashboard.
 
 **The ledger — attached to every page, editable, and pulled together in
 Report:**
 
-- Every page (Dashboard, Sales, Bookings, Delivery) has its own small
-  **"View Ledger"** button at the top, scoped to that page's own
+- Every page (Dashboard, Sales, Bookings, Delivery, Expenses) has its own
+  small **"View Ledger"** button at the top, scoped to that page's own
   activity — e.g. the Delivery page's ledger shows only delivery
   entries, so you're never hunting on another page for something that
   belongs here.
@@ -293,21 +311,22 @@ Report:**
   down the original booking/sale elsewhere.
 - Filters are **dropdowns** (not rows of small buttons), and can be
   combined: **Item**, **Debt** (unpaid/owing only — read "depth wise" as
-  "debt wise," flag if that's not what you meant), **Contact**, and
-  **Date** (dropdown: **Today / This week / Last week / This month /
-  Last month / Custom range**, the last one taking a from-date and
-  to-date).
+  "debt wise," flag if that's not what you meant), **Contact**, **Date**
+  (dropdown: **Today / This week / Last week / This month / Last month /
+  Custom range**, the last one taking a from-date and to-date), and
+  **Currency** (dropdown: **KSh / TSh / USD** — every amount on screen
+  gets converted and shown in whichever currency you pick, regardless of
+  which currency it was originally recorded in).
 
 **Report page — every ledger in one place:**
 
 - Pulls together the ledgers from all pages into a single view, instead
   of checking each page separately.
 - **Category checkboxes** — small tick-boxes for **Sales**, **Bookings**,
-  **Delivery** (and so on); tick just "Delivery" and only delivery
+  **Delivery**, **Expenses**; tick just "Delivery" and only delivery
   entries show, tick nothing/everything and you see it all combined.
-- The same **Item** and **Contact** filters as the per-page ledgers.
-- The same **Date** dropdown (Today / This week / Last week / This month
-  / Last month / Custom range).
+- The same **Item**, **Contact**, **Date**, and **Currency** filters as
+  the per-page ledgers.
 - Same editing rules as any ledger — fix a wrong entry right from here.
 
 **Settings page — starting balances + configuration:**
@@ -334,11 +353,19 @@ Settings is also where the shared configuration lives day-to-day: the
 two groups and their currencies, the default markup rule, exchange rate
 (manual or live — open question), item presets, and message templates.
 
+Settings also covers **account-level** items:
+- **Change password** — each of the four of you can change your own
+  login password here.
+- **Currency reference rates** — since every ledger and the Report page
+  let you view figures in KSh, TSh, or USD on demand (see above), the
+  USD↔KSh↔TSh exchange rates used for those conversions are set/updated
+  here, in one place, rather than per-screen.
+
 ## 12. Data model (sketch)
 
 ```
 User (Ramla, Susanna, Rashida, Alifia)
-  id, name, login
+  id, name, login, password
 
 Customer
   id, name, phone, notes
@@ -365,8 +392,11 @@ Booking (an Item claimed by a Customer)
   sold_by (User), ordered_at, arrived_at
 
 Expense
-  id, label (e.g. "transport", "bank charges"),
-  amount, booking_id (nullable, for allocation), incurred_at
+  id, type (transport | supplier_advance | exchange_fee | other),
+  label, amount, currency_code,
+  due_date (nullable, transport), arrived_date (nullable, transport),
+  supplier_advance_id (nullable, set when type = supplier_advance),
+  booking_id (nullable, for allocation), incurred_at
 
 PriceRule
   id, label (e.g. "default markup"), amount or percent
@@ -386,16 +416,21 @@ Every Item/Booking/Expense/SupplierAdvance row above also needs to
 support edit and delete from the ledger UI, not just create — that's a
 first-class requirement, not an afterthought.
 
+Every money amount is stored once, in the currency it actually happened
+in (`currency_code` on Item/Expense/etc.) — the ledger/Report **Currency**
+filter doesn't change what's stored, it just converts what's displayed,
+using the rates from `ExchangeRate`.
+
 ## 13. Suggested phases
 
 **Phase 1 — MVP (structure + bookings + settings)**
-- The six pages from §11 (Dashboard, Sales, Bookings, Delivery, Report,
-  Settings) built from the start, so the app never feels like it needs
-  reorganizing later — features get slotted into these pages, not
-  bolted on wherever's convenient.
+- The seven pages from §11 (Dashboard, Sales, Bookings, Delivery,
+  Expenses, Report, Settings) built from the start, so the app never
+  feels like it needs reorganizing later — features get slotted into
+  these pages, not bolted on wherever's convenient.
 - Settings' opening-balance entry (supplier advance, cash in hand, past
   sales, customer debt, past expenses) so the app reflects real
-  business state from day one, not zero.
+  business state from day one, not zero. Password change per user.
 - Accounts for all four of you, add/import contacts, create bookings,
   mark arrived, one-tap prefilled WhatsApp/SMS message to a customer,
   basic paid/owed tracking, attach a photo per booking.
@@ -408,15 +443,17 @@ first-class requirement, not an afterthought.
   an item into a booking when someone replies wanting it. Lives on the
   Sales page.
 
-**Phase 3 — Ledger, Report, and money tracking**
-- Expense log and profit view, including the per-person breakdown
-  (Feature 3).
+**Phase 3 — Expenses, Ledger, Report, and money tracking**
+- The Expenses page: transport/parcel charges (with due/arrived dates),
+  logging supplier advances sent, exchange fees, and other local
+  charges.
+- Profit view, including the per-person breakdown (Feature 3).
 - Supplier advance ledger with auto-deduction per order (Feature 4).
 - The per-page **View Ledger** overlay (§11) — full-screen popup,
   editable/deletable entries, dropdown filters for item/debt/contact/
-  date.
+  date/currency.
 - The **Report** page — every ledger combined, with category checkboxes
-  (Sales/Bookings/Delivery) plus the same item/contact/date filters.
+  (Sales/Bookings/Delivery/Expenses) plus the same filters.
 
 **Phase 4 — Quality of life**
 - Receive-shared-message/photo support (Android first) so you can
