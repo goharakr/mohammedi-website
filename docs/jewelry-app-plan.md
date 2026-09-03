@@ -157,13 +157,34 @@ your phone's camera roll — so they:
 - are backed up if your phone is lost or replaced,
 - can be reused later (e.g. reposting the same style).
 
-Photos get into the app either by taking/picking one directly in-app, or
-— on Android — by forwarding a photo from WhatsApp straight to the app
-via the system "Share" menu (see §9). Since one item photo can have
-several customers waiting on it (e.g. five people all ordered the same
-bangle style), tapping a photo shows **every customer linked to it** —
-so once the box arrives, you open the photo and immediately see who
-gets which piece, instead of trying to remember or dig through chats.
+**Getting 50 photos a day out of WhatsApp without doing 50 shares —
+this needed a real answer, not "forward each one":**
+
+Android's share menu isn't limited to one photo at a time — you can
+**select many photos at once and share all of them in a single action**:
+- In the supplier's WhatsApp chat, press and hold the first photo, then
+  tap each other photo you want (WhatsApp lets you multi-select this
+  way) — tap Share once, choose Trendy Wear, and all of them land in the
+  app together. 50 photos = one long press + 49 taps + one Share, not 50
+  separate forwards.
+- Backup option, since WhatsApp normally saves incoming photos straight
+  to your phone's gallery anyway: tap **"Add photos"** in the app, which
+  opens your phone's normal photo picker already sitting on the
+  WhatsApp Images album — multi-select all of today's photos there and
+  they're imported in one go.
+- Either way, this is a **batch import**, not a per-photo chore.
+
+**Turning a batch of photos into priced posts:**
+- After importing, the app gives you a **quick one-by-one tagging
+  screen**: the next photo shows, you tick its item presets (bracelet,
+  gold-plated, stone...) and paste/type its price, then it moves to the
+  next photo automatically — a fast stack to flip through rather than
+  fully separate screens per item.
+- Since one item photo can have several customers waiting on it (e.g.
+  five people all ordered the same bangle style), tapping a photo later
+  shows **every customer linked to it** — so once the box arrives, you
+  open the photo and immediately see who gets which piece, instead of
+  trying to remember or dig through chats.
 
 **Keeping storage under control:**
 
@@ -224,8 +245,11 @@ about what's actually possible:
 - Receiving a **forwarded supplier/customer message or photo into the
   app**: on **Android**, an app can register itself in the system
   "Share" menu, so you forward the WhatsApp message/photo to the app
-  like you'd forward it to any other app. On **iPhone**, this is more
-  restricted but still possible with a proper native app (a "Share
+  like you'd forward it to any other app — and this isn't limited to one
+  item at a time: Android supports **multi-select share**, so 50 photos
+  selected at once in WhatsApp still come across as a single share
+  action (see §7 for the full batch-import flow). On **iPhone**, this is
+  more restricted but still possible with a proper native app (a "Share
   Extension"); a plain web app cannot receive shares on iOS.
 
 **Option B — WhatsApp Business Platform (Cloud API)**
